@@ -2,6 +2,7 @@ import sys
 import os
 import urllib.request
 import json
+import shutil
 
 url=sys.argv[1]
 if not url.startswith("http"):
@@ -27,6 +28,27 @@ try:
                 open(media_id, "wb").write(video_decode)
                 print("Done. saved as {}".format(media_id))
                 os.system(media_id)
+        elif "edge_sidecar_to_children" in post_obj:
+            slide_posts = post_obj["edge_sidecar_to_children"]["edges"]
+            i=0
+            if os.path.exists(f"./{media_id}"):
+                    shutil.rmtree("./"+media_id)
+            os.makedirs(media_id)
+            for img in slide_posts:
+                i+=1
+                img_url=img["node"]
+                if img_url["is_video"]:
+                    img_url=img_url["video_url"]
+                    with urllib.request.urlopen(img_url) as img_url:
+                        img_decode = img_url.read()
+                        open("./"+media_id+"/"+str(i)+".mp4", "wb").write(img_decode)
+                else:
+                    img_url = img_url["display_resources"][-1]["src"]
+                    with urllib.request.urlopen(img_url) as img_url:
+                        img_decode = img_url.read()
+                        open("./"+media_id+"/"+str(i)+".jpg", "wb").write(img_decode)
+            print("Done. saved as {}".format(media_id))
+            os.system("start " + media_id)
         else:
             img_url=post_obj["display_resources"][-1]["src"]
             media_id+=".jpg"
