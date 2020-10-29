@@ -3,6 +3,7 @@ import os
 import urllib.request
 import json
 import shutil
+import subprocess
 
 url=sys.argv[1]
 if not url.startswith("http"):
@@ -48,7 +49,16 @@ try:
                         img_decode = img_url.read()
                         open("./"+media_id+"/"+str(i)+".jpg", "wb").write(img_decode)
             print("Done. saved as {}".format(media_id))
-            os.system("start " + media_id)
+            if sys.platform == 'darwin':
+                def openFolder(path):
+                    os.system('open '+ path)
+            elif sys.platform == 'linux2':
+                def openFolder(path):
+                    os.system('xdg-open '+ path)
+            elif sys.platform == 'win32':
+                def openFolder(path):
+                    os.system('start '+ path)
+            openFolder(media_id)
         else:
             img_url=post_obj["display_resources"][-1]["src"]
             media_id+=".jpg"
@@ -57,6 +67,7 @@ try:
                 img_decode = img_url.read()
                 open(media_id, "wb").write(img_decode)
                 print("Done. saved as {}".format(media_id))
-                os.system(media_id)
+                os.open(media_id)
+                # os.system(media_id)
 except urllib.error.HTTPError as e:
     print("Post " + e.reason)
