@@ -3,7 +3,6 @@ import os
 import urllib.request
 import json
 import shutil
-import subprocess
 
 url=sys.argv[1]
 if not url.startswith("http"):
